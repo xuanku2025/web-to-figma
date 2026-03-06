@@ -1,6 +1,10 @@
 const STORAGE_KEY = "enableAssetProxyFetch";
+const CONCURRENCY_KEY = "proxyFetchConcurrency";
+const DEFAULT_CONCURRENCY = "8";
+const ALLOWED_CONCURRENCY = new Set(["4", "6", "8", "10", "12", "16", "20", "infinite"]);
 
 const toggle = document.getElementById("assetProxyToggle");
+const concurrency = document.getElementById("proxyConcurrency");
 const captureBtn = document.getElementById("captureBtn");
 const status = document.getElementById("status");
 
@@ -13,13 +17,30 @@ function setBusy(busy) {
   captureBtn.textContent = busy ? "采集中..." : "开始采集";
 }
 
-chrome.storage.local.get({ [STORAGE_KEY]: false }, (res) => {
-  toggle.checked = Boolean(res[STORAGE_KEY]);
-});
+function normalizeConcurrency(value) {
+  const str = String(value ?? "");
+  return ALLOWED_CONCURRENCY.has(str) ? str : DEFAULT_CONCURRENCY;
+}
+
+chrome.storage.local.get(
+  { [STORAGE_KEY]: false, [CONCURRENCY_KEY]: DEFAULT_CONCURRENCY },
+  (res) => {
+    toggle.checked = Boolean(res[STORAGE_KEY]);
+    concurrency.value = normalizeConcurrency(res[CONCURRENCY_KEY]);
+  }
+);
 
 toggle.addEventListener("change", () => {
   chrome.storage.local.set({ [STORAGE_KEY]: toggle.checked }, () => {
     setStatus(toggle.checked ? "已开启跨域图片代理模式" : "已关闭跨域图片代理模式");
+  });
+});
+
+concurrency.addEventListener("change", () => {
+  const value = normalizeConcurrency(concurrency.value);
+  concurrency.value = value;
+  chrome.storage.local.set({ [CONCURRENCY_KEY]: value }, () => {
+    setStatus(`图片采集并发已设为：${value === "infinite" ? "无限" : value}`);
   });
 });
 

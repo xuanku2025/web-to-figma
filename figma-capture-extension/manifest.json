@@ -24,8 +24,7 @@
       "16": "logo/icon16.png",
       "48": "logo/icon48.png",
       "128": "logo/icon128.png"
-    },
-    "default_popup": "popup.html"
+    }
   },
   "web_accessible_resources": [
     {

@@ -1,4 +1,321 @@
-const a0_0x59f0d4=a0_0x3327;(function(_0x51c7d2,_0x567cbf){const _0x3341fa=a0_0x3327,_0x162d7e=_0x51c7d2();while(!![]){try{const _0x58dec4=-parseInt(_0x3341fa(0x203))/0x1*(parseInt(_0x3341fa(0x201))/0x2)+-parseInt(_0x3341fa(0x202))/0x3+-parseInt(_0x3341fa(0x1f2))/0x4*(parseInt(_0x3341fa(0x1ef))/0x5)+-parseInt(_0x3341fa(0x1fb))/0x6*(-parseInt(_0x3341fa(0x1fa))/0x7)+parseInt(_0x3341fa(0x1f8))/0x8*(parseInt(_0x3341fa(0x1ed))/0x9)+-parseInt(_0x3341fa(0x1f9))/0xa*(parseInt(_0x3341fa(0x1eb))/0xb)+-parseInt(_0x3341fa(0x1f3))/0xc*(-parseInt(_0x3341fa(0x1f5))/0xd);if(_0x58dec4===_0x567cbf)break;else _0x162d7e['push'](_0x162d7e['shift']());}catch(_0x510068){_0x162d7e['push'](_0x162d7e['shift']());}}}(a0_0x58f4,0x2093f));function a0_0x3327(_0x11d1eb,_0x3644f1){_0x11d1eb=_0x11d1eb-0x1eb;const _0x58f4c8=a0_0x58f4();let _0x332788=_0x58f4c8[_0x11d1eb];return _0x332788;}const sleep=_0xba8edf=>new Promise(_0x56700a=>setTimeout(_0x56700a,_0xba8edf));function a0_0x58f4(){const _0x3bab01=['346158wBCiAM','21gAucYm','createObjectURL','.json','figma-capture-','revokeObjectURL','340846Zzqlzb','action','990MeziNb','now','196975MypOHd','downloads','scripting','4zylPUE','1512492GkBzcc','ISOLATED','52JWqVYs','Capture\x20returned\x20empty\x20result','download','7496mhYibw','50xgXYCy','290983qrLoqz','6hsStss','stringify','onClicked','addListener','runner.js','executeScript','19586yraYqI'];a0_0x58f4=function(){return _0x3bab01;};return a0_0x58f4();}async function injectScriptFile(_0x33a1db,_0x118998){const _0x30e603=a0_0x3327;await chrome[_0x30e603(0x1f1)][_0x30e603(0x200)]({'target':{'tabId':_0x33a1db},'world':'ISOLATED','files':[_0x118998]});}async function runCapture(_0x4c2934){const _0xce3e1b=a0_0x3327;await injectScriptFile(_0x4c2934,'capture.js'),await sleep(0x12c);const [{result:_0x93e5b6}]=await chrome[_0xce3e1b(0x1f1)][_0xce3e1b(0x200)]({'target':{'tabId':_0x4c2934},'world':_0xce3e1b(0x1f4),'files':[_0xce3e1b(0x1ff)]});return _0x93e5b6;}function saveResult(_0x4490b6){const _0x17de35=a0_0x3327,_0xd1cbf2=JSON[_0x17de35(0x1fc)](_0x4490b6,null,0x2),_0x3bc725=URL[_0x17de35(0x204)](new Blob([_0xd1cbf2],{'type':'application/json'})),_0xa48bf3=_0x17de35(0x206)+Date[_0x17de35(0x1ee)]()+_0x17de35(0x205);chrome[_0x17de35(0x1f0)][_0x17de35(0x1f7)]({'url':_0x3bc725,'filename':_0xa48bf3,'saveAs':!![]},()=>{const _0x16aa29=_0x17de35;setTimeout(()=>URL[_0x16aa29(0x207)](_0x3bc725),0xbb8);});}chrome[a0_0x59f0d4(0x1ec)][a0_0x59f0d4(0x1fd)][a0_0x59f0d4(0x1fe)](async _0xc75c63=>{const _0x413cd7=a0_0x59f0d4;if(!_0xc75c63['id'])return;try{const _0x1cc1d0=await runCapture(_0xc75c63['id']);if(!_0x1cc1d0)throw new Error(_0x413cd7(0x1f6));saveResult(_0x1cc1d0);}catch(_0x1eba7d){console['error']('Capture\x20failed:',_0x1eba7d);}});
-chrome.runtime.onMessage.addListener((msg,sender,sendResponse)=>{if(!msg||msg.type!=="FIGMA_CAPTURE_FETCH_ASSET"||!msg.url)return;const url=msg.url;(async()=>{try{const res=await fetch(url,{credentials:"omit"});if(!res.ok){sendResponse({ok:false,status:res.status});return}const contentType=res.headers.get("content-type")||"application/octet-stream";const buf=await res.arrayBuffer();const bytes=new Uint8Array(buf);let binary="";const chunk=32768;for(let i=0;i<bytes.length;i+=chunk){binary+=String.fromCharCode(...bytes.subarray(i,i+chunk))}sendResponse({ok:true,status:res.status,contentType,base64:btoa(binary)})}catch(err){sendResponse({ok:false,error:String(err)})}})();return true;});
+const WORLD = "ISOLATED";
+const CAPTURE_FILE = "capture.js";
+const RUNNER_FILE = "runner.js";
+const TOOLBAR_FILE = "inpage-toolbar.js";
 
-chrome.runtime.onMessage.addListener((msg,sender,sendResponse)=>{if(!msg||msg.type!=="FIGMA_CAPTURE_START")return;(async()=>{try{const tabs=await chrome.tabs.query({active:true,currentWindow:true});const tab=tabs&&tabs[0];if(!tab||!tab.id)throw new Error("No active tab to capture");const result=await runCapture(tab.id);if(!result)throw new Error("Capture returned empty result");saveResult(result);sendResponse({ok:true});}catch(err){console.error("Capture failed:",err);sendResponse({ok:false,error:String(err)});}})();return true;});
+const FIGMA_CAPTURE_CONCURRENCY_KEY = "proxyFetchConcurrency";
+const FIGMA_CAPTURE_ALLOWED_CONCURRENCY = new Set([4, 6, 8, 10, 12, 16, 20]);
+const FIGMA_CAPTURE_DEFAULT_CONCURRENCY = 8;
+const FIGMA_CAPTURE_PROXY_SESSION_KEY = "figmaCaptureProxyAssetCacheV1";
+const FIGMA_CAPTURE_PROXY_DIAG_KEY = "figmaCaptureProxyDiagnosticsV1";
+const FIGMA_CAPTURE_PROXY_MAX_DIAG = 500;
+const FIGMA_CAPTURE_FETCH_TIMEOUT_MS = 8000;
+
+const figmaProxyQueue = [];
+const figmaProxyInFlight = new Map();
+const figmaProxyMemCache = new Map();
+let figmaProxyActive = 0;
+let figmaProxyMaxConcurrency = FIGMA_CAPTURE_DEFAULT_CONCURRENCY;
+let figmaProxySessionLoaded = false;
+let figmaProxySessionCache = {};
+let figmaProxyDiagnostics = [];
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function injectScriptFile(tabId, file) {
+  await chrome.scripting.executeScript({
+    target: { tabId },
+    world: WORLD,
+    files: [file],
+  });
+}
+
+async function runCapture(tabId) {
+  await injectScriptFile(tabId, CAPTURE_FILE);
+  await sleep(300);
+  const [{ result }] = await chrome.scripting.executeScript({
+    target: { tabId },
+    world: WORLD,
+    files: [RUNNER_FILE],
+  });
+  return result;
+}
+
+function saveResult(result) {
+  const text = JSON.stringify(result, null, 2);
+  const url = URL.createObjectURL(new Blob([text], { type: "application/json" }));
+  const filename = `figma-capture-${Date.now()}.json`;
+  chrome.downloads.download({ url, filename, saveAs: true }, () => {
+    setTimeout(() => URL.revokeObjectURL(url), 3000);
+  });
+}
+
+function normalizeConcurrency(value) {
+  if (value === "infinite" || value === "∞") {
+    return Number.POSITIVE_INFINITY;
+  }
+  const numeric = Number(value);
+  if (FIGMA_CAPTURE_ALLOWED_CONCURRENCY.has(numeric)) {
+    return numeric;
+  }
+  return FIGMA_CAPTURE_DEFAULT_CONCURRENCY;
+}
+
+function concurrencyLabel() {
+  return Number.isFinite(figmaProxyMaxConcurrency)
+    ? String(figmaProxyMaxConcurrency)
+    : "infinite";
+}
+
+async function loadConcurrencyConfig() {
+  try {
+    const data = await chrome.storage.local.get({
+      [FIGMA_CAPTURE_CONCURRENCY_KEY]: String(FIGMA_CAPTURE_DEFAULT_CONCURRENCY),
+    });
+    figmaProxyMaxConcurrency = normalizeConcurrency(
+      data?.[FIGMA_CAPTURE_CONCURRENCY_KEY]
+    );
+  } catch {
+    figmaProxyMaxConcurrency = FIGMA_CAPTURE_DEFAULT_CONCURRENCY;
+  }
+}
+
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (
+    area !== "local" ||
+    !changes ||
+    !changes[FIGMA_CAPTURE_CONCURRENCY_KEY]
+  ) {
+    return;
+  }
+  figmaProxyMaxConcurrency = normalizeConcurrency(
+    changes[FIGMA_CAPTURE_CONCURRENCY_KEY].newValue
+  );
+  pumpProxyQueue();
+});
+
+function pushDiag(entry) {
+  figmaProxyDiagnostics.push({ ts: Date.now(), ...entry });
+  if (figmaProxyDiagnostics.length > FIGMA_CAPTURE_PROXY_MAX_DIAG) {
+    figmaProxyDiagnostics = figmaProxyDiagnostics.slice(-FIGMA_CAPTURE_PROXY_MAX_DIAG);
+  }
+  if (chrome?.storage?.session) {
+    chrome.storage.session
+      .set({ [FIGMA_CAPTURE_PROXY_DIAG_KEY]: figmaProxyDiagnostics })
+      .catch(() => {});
+  }
+}
+
+async function loadProxySession() {
+  if (figmaProxySessionLoaded) return;
+  figmaProxySessionLoaded = true;
+  if (!chrome?.storage?.session) return;
+  try {
+    const data = await chrome.storage.session.get({
+      [FIGMA_CAPTURE_PROXY_SESSION_KEY]: {},
+      [FIGMA_CAPTURE_PROXY_DIAG_KEY]: [],
+    });
+    figmaProxySessionCache = data?.[FIGMA_CAPTURE_PROXY_SESSION_KEY] || {};
+    figmaProxyDiagnostics = Array.isArray(data?.[FIGMA_CAPTURE_PROXY_DIAG_KEY])
+      ? data[FIGMA_CAPTURE_PROXY_DIAG_KEY]
+      : [];
+  } catch {
+    figmaProxySessionCache = {};
+    figmaProxyDiagnostics = [];
+  }
+}
+
+async function persistProxySession() {
+  if (!chrome?.storage?.session) return;
+  try {
+    await chrome.storage.session.set({
+      [FIGMA_CAPTURE_PROXY_SESSION_KEY]: figmaProxySessionCache,
+      [FIGMA_CAPTURE_PROXY_DIAG_KEY]: figmaProxyDiagnostics,
+    });
+  } catch {
+    // no-op
+  }
+}
+
+function enqueueProxyTask(task) {
+  return new Promise((resolve, reject) => {
+    figmaProxyQueue.push({ task, resolve, reject });
+    pumpProxyQueue();
+  });
+}
+
+function pumpProxyQueue() {
+  while (figmaProxyActive < figmaProxyMaxConcurrency && figmaProxyQueue.length) {
+    const item = figmaProxyQueue.shift();
+    figmaProxyActive++;
+    Promise.resolve()
+      .then(item.task)
+      .then(item.resolve, item.reject)
+      .finally(() => {
+        figmaProxyActive--;
+        pumpProxyQueue();
+      });
+  }
+}
+
+function toBase64(arrayBuffer) {
+  const bytes = new Uint8Array(arrayBuffer);
+  let binary = "";
+  const chunk = 32768;
+  for (let i = 0; i < bytes.length; i += chunk) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + chunk));
+  }
+  return btoa(binary);
+}
+
+async function proxyFetchAsset(url) {
+  await loadProxySession();
+
+  const fromMemory = figmaProxyMemCache.get(url);
+  if (fromMemory) {
+    pushDiag({ url, phase: "proxy-cache-memory", ok: true, status: 200 });
+    return { ok: true, status: 200, cacheHit: "memory", ...fromMemory };
+  }
+
+  const fromSession = figmaProxySessionCache[url];
+  if (fromSession) {
+    figmaProxyMemCache.set(url, fromSession);
+    pushDiag({ url, phase: "proxy-cache-session", ok: true, status: 200 });
+    return { ok: true, status: 200, cacheHit: "session", ...fromSession };
+  }
+
+  if (figmaProxyInFlight.has(url)) {
+    return figmaProxyInFlight.get(url);
+  }
+
+  const promise = enqueueProxyTask(async () => {
+    try {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), FIGMA_CAPTURE_FETCH_TIMEOUT_MS);
+      let response;
+      try {
+        response = await fetch(url, {
+          credentials: "omit",
+          signal: controller.signal,
+        });
+      } finally {
+        clearTimeout(timer);
+      }
+
+      if (!response.ok) {
+        pushDiag({
+          url,
+          phase: "proxy-fetch",
+          ok: false,
+          status: response.status,
+          error: `HTTP_${response.status}`,
+        });
+        return { ok: false, status: response.status, error: `HTTP_${response.status}` };
+      }
+
+      const contentType = response.headers.get("content-type") || "application/octet-stream";
+      const base64 = toBase64(await response.arrayBuffer());
+      const payload = { contentType, base64 };
+      figmaProxyMemCache.set(url, payload);
+      figmaProxySessionCache[url] = payload;
+      persistProxySession();
+      pushDiag({
+        url,
+        phase: "proxy-fetch",
+        ok: true,
+        status: response.status,
+        bytes: base64.length,
+      });
+
+      return {
+        ok: true,
+        status: response.status,
+        contentType,
+        base64,
+        cacheHit: "miss",
+      };
+    } catch (error) {
+      const message = String(error);
+      pushDiag({ url, phase: "proxy-fetch", ok: false, status: 0, error: message });
+      return { ok: false, status: 0, error: message };
+    }
+  }).finally(() => {
+    figmaProxyInFlight.delete(url);
+  });
+
+  figmaProxyInFlight.set(url, promise);
+  return promise;
+}
+
+chrome.action.onClicked.addListener(async (tab) => {
+  if (!tab?.id) return;
+  try {
+    await injectScriptFile(tab.id, TOOLBAR_FILE);
+  } catch (error) {
+    console.error("Toolbar inject failed:", error);
+  }
+});
+
+chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
+  if (!msg || msg.type !== "FIGMA_CAPTURE_START") return;
+  (async () => {
+    try {
+      const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+      const tab = tabs && tabs[0];
+      if (!tab?.id) {
+        throw new Error("No active tab to capture");
+      }
+      const result = await runCapture(tab.id);
+      if (!result) {
+        throw new Error("Capture returned empty result");
+      }
+      saveResult(result);
+      sendResponse({ ok: true });
+    } catch (error) {
+      console.error("Capture failed:", error);
+      sendResponse({ ok: false, error: String(error) });
+    }
+  })();
+  return true;
+});
+
+chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
+  if (!msg || msg.type !== "FIGMA_CAPTURE_FETCH_ASSET" || !msg.url) return;
+  (async () => {
+    const result = await proxyFetchAsset(msg.url);
+    sendResponse({
+      ...result,
+      diagnostics: {
+        phase: "proxy",
+        cacheHit: result.cacheHit || null,
+        queueDepth: figmaProxyQueue.length,
+        activeRequests: figmaProxyActive,
+        maxConcurrency: concurrencyLabel(),
+      },
+    });
+  })();
+  return true;
+});
+
+chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
+  if (!msg || msg.type !== "FIGMA_CAPTURE_GET_DIAGNOSTICS") return;
+  (async () => {
+    await loadProxySession();
+    sendResponse({
+      ok: true,
+      diagnostics: {
+        generatedAt: new Date().toISOString(),
+        queueDepth: figmaProxyQueue.length,
+        activeRequests: figmaProxyActive,
+        inFlight: figmaProxyInFlight.size,
+        maxConcurrency: concurrencyLabel(),
+        failures: figmaProxyDiagnostics.filter((x) => x && x.ok === false),
+      },
+    });
+  })();
+  return true;
+});
+
+loadConcurrencyConfig();
