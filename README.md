@@ -1,7 +1,5 @@
 # Web to Figma (Chrome Extension)
 
-[中文介绍](#中文介绍)
-
 ## Demo
 
 [Watch Demo](https://x.com/xin_pai88825/status/2029792800653594675)
@@ -64,29 +62,3 @@ zip -r web-to-figma-extension.zip . -x "*.DS_Store" -x ".git/*"
 
 - `capture.js` is the core capture runtime.
 - If you obfuscate code, do it on a release copy, not on source files.
-
----
-
-## 中文介绍
-
-本插件用于采集网页内容并导出为可用于 Figma 工作流的数据，支持整页采集、元素采集，以及可选的跨域图片代理拉取。
-
-### 功能
-
-- 网页内悬浮工具栏，一键开始采集
-- 可选“跨域图片代理模式”，减少丢图
-- 图片采集并发可配置（`4/6/8/10/12/16/20/无限`）
-- 采集结果可导出为 `.json`
-
-### 本地安装
-
-1. 打开 `chrome://extensions/`
-2. 开启“开发者模式”
-3. 点击“加载已解压的扩展程序”
-4. 选择仓库根目录
-
-### 打包命令
-
-```bash
-zip -r web-to-figma-extension.zip . -x "*.DS_Store" -x ".git/*"
-```
