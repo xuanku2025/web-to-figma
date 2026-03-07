@@ -2,6 +2,10 @@
 
 [中文介绍](#中文介绍)
 
+## Demo
+
+[Watch Demo](https://x.com/xin_pai88825/status/2029792800653594675)
+
 Capture web pages and export them as data for Figma workflows.  
 Supports full-page capture, element capture, and optional cross-origin image proxy fetching.
 
