@@ -62,3 +62,14 @@ zip -r web-to-figma-extension.zip . -x "*.DS_Store" -x ".git/*"
 
 - `capture.js` is the core capture runtime.
 - If you obfuscate code, do it on a release copy, not on source files.
+
+## Disclaimer
+
+- This project is provided for learning, research, and productivity use only.
+- You are responsible for complying with website terms, copyright rules, privacy laws, and applicable local regulations.
+- Do not use this tool to capture or distribute unauthorized, sensitive, or illegal content.
+- The authors and contributors are not liable for misuse, data loss, or any direct/indirect damages caused by this project.
+
+## License
+
+This project is open-sourced under the [MIT License](./LICENSE).
