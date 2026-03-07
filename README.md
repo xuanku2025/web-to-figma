@@ -1,18 +1,21 @@
-# Web to Figma（Chrome 扩展）
+# Web to Figma (Chrome Extension)
 
-将网页内容采集为可用于 Figma 的设计数据，支持整页采集、元素采集，以及跨域图片代理拉取。
+[中文介绍](#中文介绍)
 
-## 功能特性
+Capture web pages and export them as data for Figma workflows.  
+Supports full-page capture, element capture, and optional cross-origin image proxy fetching.
 
-- 网页内悬浮工具栏，一键开始采集
-- 跨域图片代理模式（可选），减少图片丢失
-- 图片采集并发可配置（4/6/8/10/12/16/20/无限）
-- 支持导出采集结果为 `.json`
+## Features
 
-## 目录结构
+- In-page floating toolbar with one-click capture
+- Optional cross-origin image proxy mode to reduce missing images
+- Configurable image fetch concurrency (`4/6/8/10/12/16/20/infinite`)
+- Export capture result as `.json`
+
+## Project Structure
 
 ```text
-web to figma/
+.
 ├── manifest.json
 ├── background.js
 ├── capture.js
@@ -24,37 +27,62 @@ web to figma/
 └── logo/
 ```
 
-## 本地安装（开发者模式）
+## Local Installation (Developer Mode)
 
-1. 打开 Chrome 扩展页：`chrome://extensions/`
-2. 打开右上角“开发者模式”
-3. 点击“加载已解压的扩展程序”
-4. 选择本目录：`web to figma`
+1. Open `chrome://extensions/`
+2. Enable `Developer mode`
+3. Click `Load unpacked`
+4. Select this repository root directory
 
-## 使用说明
+## Usage
 
-1. 打开任意网页
-2. 点击扩展图标，或使用页面工具栏
-3. 按需开启“跨域图片代理模式”
-4. 点击“开始采集”
-5. 采集完成后下载 `figma-capture-*.json`
+1. Open any webpage
+2. Click the extension icon (or use the in-page toolbar)
+3. Enable `Cross-origin image proxy mode` if needed
+4. Click `Start Capture`
+5. Download the generated `figma-capture-*.json`
 
-## 跨域图片代理说明
+## Cross-Origin Image Proxy Notes
 
-- 开启后由扩展后台代理拉取图片，可减少丢图，但采集速度会变慢。
-- 可通过“图片采集并发”控制代理并发数：
-  - 并发越高：速度更快，但失败风险可能增加
-  - 并发越低：更稳定，但速度更慢
+- When enabled, the extension fetches images through the background proxy.
+- This improves image completeness but can make capture slower.
+- Use `Image Fetch Concurrency` to balance speed and stability.
 
-## 打包发布
+## Packaging
 
-在项目根目录执行：
+Run in repository root:
 
 ```bash
-zip -r web-to-figma-extension.zip "web to figma" -x "*.DS_Store"
+zip -r web-to-figma-extension.zip . -x "*.DS_Store" -x ".git/*"
 ```
 
-## 备注
+## Notes
 
-- `capture.js` 为采集核心脚本，建议保持现有构建产物形态。
-- 如需代码混淆，建议仅对发布副本处理，不要覆盖源码。
+- `capture.js` is the core capture runtime.
+- If you obfuscate code, do it on a release copy, not on source files.
+
+---
+
+## 中文介绍
+
+本插件用于采集网页内容并导出为可用于 Figma 工作流的数据，支持整页采集、元素采集，以及可选的跨域图片代理拉取。
+
+### 功能
+
+- 网页内悬浮工具栏，一键开始采集
+- 可选“跨域图片代理模式”，减少丢图
+- 图片采集并发可配置（`4/6/8/10/12/16/20/无限`）
+- 采集结果可导出为 `.json`
+
+### 本地安装
+
+1. 打开 `chrome://extensions/`
+2. 开启“开发者模式”
+3. 点击“加载已解压的扩展程序”
+4. 选择仓库根目录
+
+### 打包命令
+
+```bash
+zip -r web-to-figma-extension.zip . -x "*.DS_Store" -x ".git/*"
+```
