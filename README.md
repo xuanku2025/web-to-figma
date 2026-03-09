@@ -4,6 +4,10 @@
 
 [Watch Demo](https://x.com/xin_pai88825/status/2029792800653594675)
 
+## Extension Download & Tutorial
+
+[Download & User Guide](https://gwrdluzl9j9.feishu.cn/wiki/TTibw3e8niWpvmkfSIWc8bUmnJc)
+
 Capture web pages and export them as data for Figma workflows.  
 Supports full-page capture, element capture, and optional cross-origin image proxy fetching.
 
