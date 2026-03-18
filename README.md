@@ -2,7 +2,7 @@
 
 ## Demo
 
-[Watch Demo](https://x.com/xin_pai88825/status/2029792800653594675)
+[Watch Demo](https://www.zstack.io/)
 
 ## Extension Download & Tutorial
 

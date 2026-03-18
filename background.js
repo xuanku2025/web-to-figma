@@ -45,11 +45,10 @@ async function runCapture(tabId) {
 
 function saveResult(result) {
   const text = JSON.stringify(result, null, 2);
-  const url = URL.createObjectURL(new Blob([text], { type: "application/json" }));
+  const base64 = btoa(unescape(encodeURIComponent(text)));
+  const url = "data:application/json;base64," + base64;
   const filename = `figma-capture-${Date.now()}.json`;
-  chrome.downloads.download({ url, filename, saveAs: true }, () => {
-    setTimeout(() => URL.revokeObjectURL(url), 3000);
-  });
+  chrome.downloads.download({ url, filename, saveAs: true });
 }
 
 function normalizeConcurrency(value) {
@@ -282,6 +281,29 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
 });
 
 chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
+  if (!msg || msg.type !== "FIGMA_CAPTURE_WITH_DATA") return;
+  (async () => {
+    try {
+      const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+      const tab = tabs && tabs[0];
+      if (!tab?.id) {
+        throw new Error("No active tab to capture");
+      }
+      const result = await runCapture(tab.id);
+      if (!result) {
+        throw new Error("Capture returned empty result");
+      }
+      const json = JSON.stringify(result);
+      sendResponse({ ok: true, json });
+    } catch (error) {
+      console.error("Capture failed:", error);
+      sendResponse({ ok: false, error: String(error) });
+    }
+  })();
+  return true;
+});
+
+chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   if (!msg || msg.type !== "FIGMA_CAPTURE_FETCH_ASSET" || !msg.url) return;
   (async () => {
     const result = await proxyFetchAsset(msg.url);
@@ -316,6 +338,23 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
     });
   })();
   return true;
+});
+
+chrome.commands.onCommand.addListener(async (command) => {
+  if (command !== "quick-capture") return;
+  try {
+    const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+    const tab = tabs && tabs[0];
+    if (!tab?.id) return;
+    const result = await runCapture(tab.id);
+    if (!result) {
+      console.error("Quick capture returned empty result");
+      return;
+    }
+    saveResult(result);
+  } catch (error) {
+    console.error("Quick capture failed:", error);
+  }
 });
 
 loadConcurrencyConfig();

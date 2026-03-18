@@ -3,10 +3,18 @@ const CONCURRENCY_KEY = "proxyFetchConcurrency";
 const DEFAULT_CONCURRENCY = "8";
 const ALLOWED_CONCURRENCY = new Set(["4", "6", "8", "10", "12", "16", "20", "infinite"]);
 
+const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0 ||
+  navigator.userAgent.indexOf("Mac") >= 0;
+
 const toggle = document.getElementById("assetProxyToggle");
 const concurrency = document.getElementById("proxyConcurrency");
 const captureBtn = document.getElementById("captureBtn");
 const status = document.getElementById("status");
+const shortcutKey = document.getElementById("shortcutKey");
+
+if (shortcutKey) {
+  shortcutKey.textContent = isMac ? "⌃+Shift+C" : "Alt+Shift+C";
+}
 
 function setStatus(text) {
   status.textContent = text || "";

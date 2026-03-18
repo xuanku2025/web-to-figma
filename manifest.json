@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Web to Figma",
   "version": "1.0.0",
-  "description": "Web to Figma 一键抓取网页并转换为可编辑设计稿，By 派大鑫（小红书：https://www.xiaohongshu.com/user/profile/5a2e96aab1da1465364b727b）。",
+  "description": "Web to Figma 一键抓取网页并转换为可编辑设计稿，By ZStack（官网：https://www.zstack.io/）。",
   "permissions": [
     "activeTab",
     "scripting",
@@ -38,6 +38,15 @@
       ]
     }
   ],
+  "commands": {
+    "quick-capture": {
+      "suggested_key": {
+        "default": "Alt+Shift+C",
+        "mac": "MacCtrl+Shift+C"
+      },
+      "description": "快速采集当前页面"
+    }
+  },
   "host_permissions": [
     "<all_urls>"
   ]
