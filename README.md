@@ -1,13 +1,5 @@
 # Web to Figma (Chrome Extension)
 
-## Demo
-
-[Watch Demo](https://www.zstack.io/)
-
-## Extension Download & Tutorial
-
-[Download & User Guide](https://gwrdluzl9j9.feishu.cn/wiki/TTibw3e8niWpvmkfSIWc8bUmnJc)
-
 Capture web pages and export them as data for Figma workflows.  
 Supports full-page capture, element capture, and optional cross-origin image proxy fetching.
 
